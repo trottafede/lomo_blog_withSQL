@@ -45,7 +45,14 @@
               </div>
               <h3><%- singleBlog.title %></h3>
               <p><%- singleBlog.content.substr(0,150)%></p>
-              <p><i>Article made by: <%- singleBlog.author %></i></p>
+              <p>
+                <i>Article made by: <%- singleBlog.author %> </i>
+                <br />
+                <em
+                  ><%- singleBlog.createdDate.toLocaleDateString('en-us', {
+                  weekday:"long", year:"numeric", month:"long"}); %></em
+                >
+              </p>
               <a href="/articulo/<%- singleBlog.id %>">Read more</a>
             </div>
           </div>
