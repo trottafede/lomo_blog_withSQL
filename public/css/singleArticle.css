@@ -1,0 +1,112 @@
+/* Re chiquito */
+#SingleArticle h1 {
+  text-align: center;
+  margin: 30px 0;
+}
+
+#SingleArticle #imgContainer {
+  display: flex;
+  justify-content: center;
+}
+
+#SingleArticle img {
+  width: 300px;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+#SingleArticle p {
+  margin: 20px 0;
+  font-size: 1rem;
+}
+
+#SingleArticle #author {
+  color: grey;
+  font-size: 1.2rem;
+  text-align: end;
+  margin-right: 10px;
+}
+
+@media (min-width: 576px) {
+  #SingleArticle h1 {
+    text-align: center;
+    margin: 30px 0;
+  }
+
+  #SingleArticle #imgContainer {
+    display: flex;
+    justify-content: center;
+  }
+
+  #SingleArticle img {
+    width: 500px;
+    height: auto;
+  }
+
+  #SingleArticle p {
+    margin: 20px 0;
+    font-size: 1.1rem;
+  }
+
+  #SingleArticle #author {
+    color: grey;
+    font-size: 1.2rem;
+    text-align: end;
+    margin-right: 10px;
+  }
+}
+
+@media (min-width: 768px) {
+  #SingleArticle h1 {
+    text-align: center;
+    margin: 30px 0;
+  }
+
+  #SingleArticle #imgContainer {
+    display: flex;
+    justify-content: center;
+  }
+
+  #SingleArticle img {
+    width: 700px;
+    height: auto;
+  }
+
+  #SingleArticle p {
+    margin: 20px 0;
+    font-size: 1.2rem;
+  }
+
+  #SingleArticle #author {
+    color: grey;
+    font-size: 1.3rem;
+    text-align: end;
+    margin-right: 10px;
+  }
+}
+/* Laptop screen */
+@media (min-width: 992px) {
+  #SingleArticle h1 {
+    text-align: center;
+    margin: 30px 0;
+  }
+
+  #SingleArticle #imgContainer {
+    display: flex;
+    justify-content: center;
+  }
+
+  #SingleArticle img {
+    width: auto;
+    height: 500px;
+  }
+
+  #SingleArticle p {
+    margin: 30px 0;
+  }
+  #SingleArticle #author {
+    color: grey;
+    font-size: 1.2rem;
+    text-align: end;
+  }
+}
