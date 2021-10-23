@@ -4,11 +4,11 @@ const router = express.Router();
 const mysql = require("mysql2");
 
 router.get("/", (req, res) => {
-  var connection = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "Dumbledore@0142",
-    database: "ha_blog2021",
+  let connection = mysql.createConnection({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
   });
 
   connection.connect();
@@ -27,11 +27,11 @@ router.get("/", (req, res) => {
 router.get("/articulo/:id", (req, res) => {
   let key = req.params.id;
 
-  var connection = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "Dumbledore@0142",
-    database: "ha_blog2021",
+  let connection = mysql.createConnection({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
   });
 
   connection.connect();
@@ -47,6 +47,29 @@ router.get("/articulo/:id", (req, res) => {
   );
 
   connection.end();
+});
+
+router.get("/admin", (req, res) => {
+  let connection = mysql.createConnection({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
+  });
+
+  connection.connect();
+
+  connection.query(
+    "SELECT * FROM `seederDB` ",
+    function (error, blogs, fields) {
+      if (error) throw error;
+      res.render("home", { blogs });
+    }
+  );
+
+  connection.end();
+
+  res.render("admin");
 });
 
 router.get("/admin/createArticle", (req, res) => {
