@@ -35,33 +35,109 @@
                   <th scope="col">Title</th>
                   <th scope="col">Author</th>
                   <th scope="col">Image</th>
+                  <th scope="col">Date</th>
+                  <th scope="col">Actions</th>
                 </tr>
               </thead>
               <tbody>
+                <% blogs.forEach(function(singleBlog){ %>
                 <tr>
-                  <th scope="row">1</th>
-                  <td>Mark</td>
-                  <td>Otto</td>
-                  <td>@mdo</td>
+                  <th scope="row"><%- singleBlog.id %></th>
+                  <td>
+                    <a href="/articulo/<%- singleBlog.id %>"
+                      ><%- singleBlog.title %></a
+                    >
+                  </td>
+                  <td><%- singleBlog.author %></td>
+                  <td>
+                    <img
+                      src="<%- singleBlog.image %>"
+                      width="auto"
+                      height="50px"
+                      alt="<% singleBlog.id %>"
+                    />
+                  </td>
+                  <td>
+                    <%- singleBlog.createdDate.toLocaleDateString('en-us', {
+                    weekday:"long", year:"numeric", month:"long"}); %>
+                  </td>
+                  <td>
+                    <a
+                      href="/admin/updateArticle/<%- singleBlog.id %>"
+                      class="btn btn-success"
+                      >Update</a
+                    >
+                    <a href="/" class="btn btn-danger">Delete</a>
+                  </td>
                 </tr>
-                <tr>
-                  <th scope="row">2</th>
-                  <td>Jacob</td>
-                  <td>Thornton</td>
-                  <td>@fat</td>
-                </tr>
-                <tr>
-                  <th scope="row">3</th>
-                  <td colspan="2">Larry the Bird</td>
-                  <td>@twitter</td>
-                </tr>
+                <% }); %>
               </tbody>
             </table>
           </div>
         </div>
 
-        <div class="col-lg-4">
-          <h2>Create</h2>
+        <div class="col-lg-4 d-flex justify-content-center">
+          <form action="/admin/createArticle" method="post">
+            <div class="mb-3">
+              <label class="form-label" for="title">Ingrese titulo</label>
+              <input
+                required
+                maxlength="255"
+                minlength="5"
+                class="form-control"
+                type="text"
+                name="title"
+                id="title"
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="author" class="form-label">Author</label>
+              <input
+                required
+                maxlength="255"
+                minlength="5"
+                class="form-control"
+                type="text"
+                name="author"
+                id="author"
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="image" class="form-label"
+                >Ingrese la url de la imágen</label
+              >
+              <input
+                required
+                maxlength="21844"
+                minlength="5"
+                class="form-control"
+                type="text"
+                name="image"
+                id="image"
+              />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label" for="content">Ingrese contenido</label>
+              <textarea
+                class="form-control"
+                name="content"
+                id="content"
+                cols="30"
+                rows="10"
+                required
+                maxlength="21844"
+                minlength="5"
+              ></textarea>
+            </div>
+            <div class="mb-3">
+              <button class="btn btn-primary" type="submit">
+                Crear articulo
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
