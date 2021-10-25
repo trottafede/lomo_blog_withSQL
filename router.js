@@ -17,12 +17,15 @@ router.get("/", (req, res) => {
     console.log("Connected!");
   });
 
-  client.query("SELECT * from articles", (err, result) => {
-    if (err) throw err;
-    let blogs = result.rows;
-    res.render("home", { blogs });
-    client.end();
-  });
+  client.query(
+    "SELECT * from articles ORDER BY created_at DESC",
+    (err, result) => {
+      if (err) throw err;
+      let blogs = result.rows;
+      res.render("home", { blogs });
+      client.end();
+    }
+  );
 });
 
 router.get("/articulo/:id", (req, res) => {
@@ -61,12 +64,15 @@ router.get("/admin", (req, res) => {
     if (err) throw err;
   });
 
-  client.query("SELECT * FROM articles ", (err, result) => {
-    if (err) throw err;
-    let blogs = result.rows;
-    res.render("admin", { blogs });
-    client.end();
-  });
+  client.query(
+    "SELECT * FROM articles ORDER BY created_at DESC",
+    (err, result) => {
+      if (err) throw err;
+      let blogs = result.rows;
+      res.render("admin", { blogs });
+      client.end();
+    }
+  );
 });
 
 router.get("/admin/updateArticle/:id", (req, res) => {
@@ -246,11 +252,14 @@ router.get("/api/articulos", (req, res) => {
   });
 
   // simple query
-  client.query("SELECT * FROM articles ", (err, result) => {
-    if (err) throw err;
-    res.json(result.rows);
-    client.end();
-  });
+  client.query(
+    "SELECT * FROM articles ORDER BY created_at DESC",
+    (err, result) => {
+      if (err) throw err;
+      res.json(result.rows);
+      client.end();
+    }
+  );
 });
 
 router.get("*", (req, res) => {
