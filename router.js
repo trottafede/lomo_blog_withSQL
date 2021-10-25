@@ -1,96 +1,123 @@
-const { render } = require("ejs");
 const express = require("express");
 const router = express.Router();
 const mysql = require("mysql2");
+const nodemailer = require("nodemailer");
+const { Client } = require("pg");
 
 router.get("/", (req, res) => {
-  let connection = mysql.createConnection({
+  const client = new Client({
+    port: process.env.DB_PORT,
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
   });
 
-  connection.connect();
+  client.connect(function (err) {
+    if (err) throw err;
+    console.log("Connected!");
+  });
 
-  connection.query(
-    "SELECT * FROM `seederDB` ",
-    function (error, blogs, fields) {
-      if (error) throw error;
-      res.render("home", { blogs });
-    }
-  );
-
-  connection.end();
+  client.query("SELECT * from articles", (err, result) => {
+    if (err) throw err;
+    let blogs = result.rows;
+    res.render("home", { blogs });
+    client.end();
+  });
 });
 
 router.get("/articulo/:id", (req, res) => {
   let key = req.params.id;
 
-  let connection = mysql.createConnection({
+  const client = new Client({
+    port: process.env.DB_PORT,
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
   });
 
-  connection.connect();
+  client.connect(function (err) {
+    if (err) throw err;
+  });
 
-  connection.query(
-    "SELECT * FROM `seederDB` WHERE `id` = ?",
-    [key],
-    function (error, data, fields) {
-      if (error) throw error;
-      let singleBlog = data[0];
-      res.render("article", { singleBlog });
-    }
-  );
-
-  connection.end();
+  client.query("SELECT * FROM articles WHERE id = $1", [key], (err, result) => {
+    if (err) throw err;
+    let singleBlog = result.rows[0];
+    res.render("article", { singleBlog });
+    client.end();
+  });
 });
 
 router.get("/admin", (req, res) => {
-  let connection = mysql.createConnection({
+  const client = new Client({
+    port: process.env.DB_PORT,
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
   });
 
-  connection.connect();
+  client.connect(function (err) {
+    if (err) throw err;
+  });
 
-  connection.query(
-    "SELECT * FROM `seederDB` ",
-    function (error, blogs, fields) {
-      if (error) throw error;
-      res.render("admin", { blogs });
-    }
-  );
-
-  connection.end();
+  client.query("SELECT * FROM articles ", (err, result) => {
+    if (err) throw err;
+    let blogs = result.rows;
+    res.render("admin", { blogs });
+    client.end();
+  });
 });
 
 router.get("/admin/updateArticle/:id", (req, res) => {
   let key = req.params.id;
-  let connection = mysql.createConnection({
+  const client = new Client({
+    port: process.env.DB_PORT,
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
   });
 
-  connection.connect();
+  client.connect(function (err) {
+    if (err) throw err;
+  });
 
-  let singleBlog = connection.query(
-    "SELECT * FROM `seederDB` WHERE `id` = (?)",
+  client.query(
+    "SELECT * FROM articles WHERE id = ($1)",
     [key],
-    function (error, data, fields) {
-      if (error) throw error;
-      const singleBlog = data[0];
+    (err, result) => {
+      if (err) throw err;
+      let singleBlog = result.rows[0];
       res.render("updateArticle", { singleBlog });
+      client.end();
     }
   );
-  connection.end();
+});
+
+router.get("/admin/deleteArticle/:id", (req, res) => {
+  let { id } = req.params;
+
+  // create the connection to database
+  const client = new Client({
+    port: process.env.DB_PORT,
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
+  });
+
+  client.connect(function (err) {
+    if (err) throw err;
+  });
+
+  // simple query
+  client.query(`DELETE FROM articles WHERE id = ($1)`, [id], (err, result) => {
+    if (err) throw err;
+    res.redirect("/admin");
+    client.end();
+  });
 });
 
 router.post("/admin/updateArticle", (req, res) => {
@@ -106,32 +133,33 @@ router.post("/admin/updateArticle", (req, res) => {
     image.length >= 5
   ) {
     let fecha = new Date();
-    let queryString =
-      "UPDATE seederDB SET title = ?, content = ?, author = ?, image = ?, createdDate = ? WHERE id = ?";
-    let dataArray = [title, content, author, image, fecha, id];
+    const query = {
+      text: "UPDATE articles SET title = ($1), content = ($2), author = ($3), image = ($4), created_at = ($5) WHERE id = ($6)",
+      values: [title, content, author, image, fecha, id],
+    };
 
     // create the connection to database
-    let connection = mysql.createConnection({
+    const client = new Client({
+      port: process.env.DB_PORT,
       host: process.env.DB_HOST,
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
     });
 
-    connection.connect(function (err) {
+    client.connect(function (err) {
       if (err) throw err;
     });
-
     // simple query
-    connection.query(queryString, dataArray, function (err, results, fields) {
+    client.query(query, (err, result) => {
       if (err) throw err;
       res.redirect("/admin");
+      client.end();
     });
-    connection.end();
   }
 });
 
-router.post("/admin/createArticle", (req, res) => {
+router.post("/admin/createArticle", async (req, res) => {
   let { title, content, author, image } = req.body;
 
   if (
@@ -145,28 +173,85 @@ router.post("/admin/createArticle", (req, res) => {
     image.length >= 5
   ) {
     let fecha = new Date();
-    let queryString = `INSERT INTO seederDB (title, content, author, image, createdDate) VALUES (?,?,?,?,?)`;
+    let queryString = `INSERT INTO articles (title, content, author, image, created_at) VALUES ($1,$2,$3,$4,$5)`;
     let dataArray = [title, content, author, image, fecha];
 
     // create the connection to database
-    let connection = mysql.createConnection({
+    const client = new Client({
+      port: process.env.DB_PORT,
       host: process.env.DB_HOST,
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
     });
 
-    connection.connect(function (err) {
+    client.connect(function (err) {
       if (err) throw err;
     });
 
+    // Nodemail
+
+    // Generate test SMTP service account from ethereal.email
+    // Only needed if you don't have a real mail account for testing
+    // let testAccount = await nodemailer.createTestAccount();
+
+    // create reusable transporter object using the default SMTP transport
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.NODE_MAILER_USER,
+        pass: process.env.NODE_MAILER_PASSWORD, // naturally, replace both with your real credentials or an application-specific password
+      },
+    });
+
+    let textToSend = `
+      Se creó un articulo con el titulo: ${title}.
+      El autor del articulo es: ${author}
+      Imágen de perfil: ${image}
+      El contendio de dicho articulo es:
+      ${content}. 
+    `;
+    const mailOptions = {
+      from: process.env.NODE_MAILER_USER,
+      to: process.env.NODE_MAILER_USER,
+      subject: "Lomoblog - nuevo post",
+      text: textToSend,
+    };
+
+    // send mail with defined transport object
+    transporter.sendMail(mailOptions, function (err, info) {
+      if (err) throw err;
+      console.log("Email sent: " + info.response);
+    });
+
     // simple query
-    connection.query(queryString, dataArray, function (err, results, fields) {
+    client.query(queryString, dataArray, (err, result) => {
       if (err) throw err;
       res.redirect("/admin");
+      client.end();
     });
-    connection.end();
   }
+});
+
+router.get("/api/articulos", (req, res) => {
+  const client = new Client({
+    port: process.env.DB_PORT,
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
+  });
+
+  client.connect(function (err) {
+    if (err) throw err;
+  });
+
+  // simple query
+  client.query("SELECT * FROM articles ", (err, result) => {
+    if (err) throw err;
+    res.json(result.rows);
+    client.end();
+  });
 });
 
 router.get("*", (req, res) => {

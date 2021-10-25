@@ -2,9 +2,9 @@
 @import url("footer.css");
 @import url("singleArticle.css");
 :root {
-  --main-bg-color: rgba(238, 2, 187, 0.932);
+  --main-bg-color: rgba(8, 23, 241, 0.932);
   --second-bg-color: #fff;
-  --hover-items: blue;
+  --hover-items: rgb(255, 0, 34);
   --card-bg: #000;
   --lettersColor: #fff;
 }

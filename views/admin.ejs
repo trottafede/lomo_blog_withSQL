@@ -58,7 +58,7 @@
                     />
                   </td>
                   <td>
-                    <%- singleBlog.createdDate.toLocaleDateString('en-us', {
+                    <%- singleBlog.created_at.toLocaleDateString('en-us', {
                     weekday:"long", year:"numeric", month:"long"}); %>
                   </td>
                   <td>
@@ -67,7 +67,11 @@
                       class="btn btn-success"
                       >Update</a
                     >
-                    <a href="/" class="btn btn-danger">Delete</a>
+                    <a
+                      href="/admin/deleteArticle/<%- singleBlog.id %>"
+                      class="btn btn-danger"
+                      >Delete</a
+                    >
                   </td>
                 </tr>
                 <% }); %>
